@@ -1,0 +1,2 @@
+# In backend directory
+pip freeze > requirements-dev.txt
