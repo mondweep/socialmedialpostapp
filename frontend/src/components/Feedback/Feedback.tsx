@@ -35,6 +35,7 @@ export const Feedback: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Request-ID': crypto.randomUUID()
         },
         body: JSON.stringify(feedbackData),
       });

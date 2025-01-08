@@ -7,9 +7,9 @@ const platformEmojis: Record<string, string> = {
   linkedin: '💼',
   facebook: '👥',
   threads: '🧵',
-  x: '🐦',
+  x: '��',
   truth: '📢',
-  bluetick: '✅'
+  bluesky: '🌅'
 };
 
 export const PlatformVariations: React.FC = () => {

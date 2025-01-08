@@ -14,40 +14,49 @@ const platforms: Platform[] = [
   { id: 'threads', name: 'Threads', characterLimit: 500 },
   { id: 'x', name: 'X', characterLimit: 280 },
   { id: 'truth', name: 'Truth Social', characterLimit: 500 },
-  { id: 'bluetick', name: 'BlueTick', characterLimit: 280 }
+  { id: 'bluesky', name: 'Bluesky', characterLimit: 300 }
 ];
 
 export const PlatformSelector: React.FC = () => {
-  const { selectedPlatforms, setSelectedPlatforms, content, setPlatformVariation } = usePostStore();
+  const { selectedPlatforms, setSelectedPlatforms, content, setPlatformVariation, setError, error } = usePostStore();
 
-  const handlePlatformChange = async (platformId: string) => {
-    const isSelected = selectedPlatforms.includes(platformId);
+  const handlePlatformChange = async (platform: string) => {
+    const isSelected = selectedPlatforms.includes(platform);
     
-    if (!isSelected) {
+    // Update selection state
+    setSelectedPlatforms(
+      isSelected 
+        ? selectedPlatforms.filter(id => id !== platform)
+        : [...selectedPlatforms, platform]
+    );
+
+    // Only format content when selecting a new platform
+    if (!isSelected && content) {
       try {
-        // Call backend formatting endpoint when platform is selected
-        const response = await fetch(`http://localhost:8000/api/format/${platformId}`, {
+        const response = await fetch(`/api/format/${platform}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ content })
+          body: JSON.stringify({ content: content }),
         });
-        
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            setError("Daily usage limit exceeded. The service will resume tomorrow.");
+            return;
+          }
+          throw new Error('Failed to format content');
+        }
+
         const data = await response.json();
-        // Update store with formatted content
-        // Note: You'll need to add this to your store
-        setPlatformVariation(platformId, data.formatted_content);
+        setPlatformVariation(platform, data.formatted_content);
+        setError(null);
       } catch (error) {
-        console.error(`Error formatting for ${platformId}:`, error);
+        console.error('Error formatting for platform:', error);
+        setError('Error formatting content. Please try again.');
       }
     }
-
-    setSelectedPlatforms(
-      isSelected
-        ? selectedPlatforms.filter((id: string) => id !== platformId)
-        : [...selectedPlatforms, platformId]
-    );
   };
 
   return (
@@ -67,6 +76,21 @@ export const PlatformSelector: React.FC = () => {
           label={`${platform.name} (${platform.characterLimit} chars)`}
         />
       ))}
+      {error && (
+        <div className="error-message" style={{
+          backgroundColor: '#ffebee',
+          color: '#c62828',
+          padding: '10px',
+          borderRadius: '4px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <span role="img" aria-label="warning">⚠️</span>
+          {error}
+        </div>
+      )}
     </Box>
   );
 };

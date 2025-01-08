@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Paper } from '@mui/material';
+import { Box, TextField, Button, Typography } from '@mui/material';
 import { usePostStore } from '../../store/postStore';
 import { useGemini } from '../../hooks/useGemini';
 
@@ -13,41 +13,41 @@ export const GeminiChat: React.FC<GeminiChatProps> = ({
   onContentUpdate 
 }) => {
   const [feedback, setFeedback] = useState('');
-  const { isGenerating, setIsGenerating } = usePostStore();
-  const { refineContent, error } = useGemini();
+  const [isRefining, setIsRefining] = useState(false);
+  const { addToConversation } = usePostStore();
+  const { refineContent } = useGemini();
 
   const handleRefine = async () => {
-    setIsGenerating(true);
+    if (!feedback) return;
+    
+    setIsRefining(true);
     try {
+      addToConversation({
+        role: 'user',
+        content: feedback
+      });
+
       const refinedContent = await refineContent(initialContent, feedback);
+      
+      addToConversation({
+        role: 'assistant',
+        content: refinedContent
+      });
+
       onContentUpdate(refinedContent);
       setFeedback('');
     } catch (error) {
       console.error('Error refining content:', error);
     } finally {
-      setIsGenerating(false);
+      setIsRefining(false);
     }
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 2, mt: 2 }}>
-      {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {error}
-        </Typography>
-      )}
+    <Box sx={{ mt: 3 }}>
       <Typography variant="h6" gutterBottom>
         Refine Your Post
       </Typography>
-      
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="body1" sx={{ mb: 1 }}>
-          Current Version:
-        </Typography>
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          {initialContent}
-        </Paper>
-      </Box>
 
       <TextField
         fullWidth
@@ -63,10 +63,10 @@ export const GeminiChat: React.FC<GeminiChatProps> = ({
       <Button
         variant="contained"
         onClick={handleRefine}
-        disabled={!feedback || isGenerating}
+        disabled={!feedback || isRefining}
       >
-        {isGenerating ? 'Refining...' : 'Refine with AI'}
+        {isRefining ? 'Refining...' : 'Refine with AI'}
       </Button>
-    </Paper>
+    </Box>
   );
 }; 

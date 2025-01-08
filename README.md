@@ -16,7 +16,7 @@ An AI-powered social media management tool that helps create, refine, and adapt 
 - 👥 Facebook (63206 chars)
 - 🧵 Threads (500 chars)
 - 📢 Truth Social (500 chars)
-- ✅ BlueTick (280 chars)
+-�� Bluesky (300 chars)
 
 ### Smart Content Adaptation
 - 📏 Automatic length adjustment per platform
