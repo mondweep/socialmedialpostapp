@@ -1,7 +1,9 @@
+from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
 
 class Feedback(BaseModel):
     rating: int
     comment: str
-    timestamp: str  # Changed from datetime to str since we're sending ISO string from frontend 
+    timestamp: str  # Keep as string to match frontend
+    request_id: str = None  # For tracking requests
+    client_ip: str = None   # For usage monitoring 
