@@ -1,6 +1,11 @@
 from datetime import datetime
 from pydantic import BaseModel
 
+class Usage(BaseModel):
+    date: str
+    request_count: int
+    last_updated: datetime
+
 class Feedback(BaseModel):
     rating: int
     comment: str

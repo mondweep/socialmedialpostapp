@@ -51,6 +51,7 @@ else:
     logger.error("No Gemini API key found!")
 
 # Get DAILY_REQUEST_LIMIT from environment variable, with a default fallback of 100
+ENABLE_DAILY_LIMIT = os.getenv('ENABLE_DAILY_LIMIT', 'false').lower() == 'true'
 DAILY_REQUEST_LIMIT = int(os.getenv('DAILY_REQUEST_LIMIT', 100))
 
 # Models

@@ -5,7 +5,7 @@ export const useGemini = () => {
 
   const generateContent = async (context: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/generate', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}api/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export const useGemini = () => {
 
   const refineContent = async (currentContent: string, refinementPrompt: string) => {
     try {
-      const response = await fetch('http://localhost:8000/api/refine', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}api/refine`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
