@@ -31,11 +31,11 @@ export const Feedback: React.FC = () => {
       
       console.log('Preparing to send feedback:', feedbackData);
       
-      const response = await fetch('/api/feedback', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}api/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Request-ID': crypto.randomUUID()
+          //'X-Request-ID': crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2)
         },
         body: JSON.stringify(feedbackData),
       });

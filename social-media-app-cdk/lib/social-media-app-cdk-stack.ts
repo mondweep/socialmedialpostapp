@@ -6,6 +6,7 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as dotenv from 'dotenv';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as path from 'path';
 
 dotenv.config();
 
@@ -21,10 +22,17 @@ export class SocialMediaAppCdkStack extends cdk.Stack {
     });
 
     // Lambda Function for backend
+    const layer = new lambda.LayerVersion(this, 'DependenciesLayer', {
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../backend/lambda-layer/layer.zip')),
+      compatibleRuntimes: [lambda.Runtime.PYTHON_3_10],
+      description: 'FastAPI and dependencies',
+    });
+
     const backendFunction = new lambda.Function(this, 'BackendFunction', {
-      runtime: lambda.Runtime.PYTHON_3_12,
+      runtime: lambda.Runtime.PYTHON_3_10,
       handler: 'lambda_handler.handler',
-      code: lambda.Code.fromAsset('lambda_function.zip'),
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda_function.zip')),
+      layers: [layer],
       environment: {
         DYNAMODB_TABLE: usageTable.tableName,
         GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
@@ -87,5 +95,15 @@ export class SocialMediaAppCdkStack extends cdk.Stack {
       value: websiteBucket.bucketWebsiteUrl,
       description: 'Website URL',
     });
+
+    // Create the Feedback table
+    const feedbackTable = new dynamodb.Table(this, 'FeedbackTable', {
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY  // Use RETAIN for production
+    });
+
+    // Add DynamoDB permissions to Lambda role
+    feedbackTable.grantWriteData(backendFunction);  // Grants putItem, updateItem, deleteItem
   }
 }

@@ -35,8 +35,7 @@ export const PostEditor: React.FC = () => {
     setError(null);
     
     try {
-      // First check if we've hit the rate limit
-      const response = await fetch('/api/generate', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}api/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

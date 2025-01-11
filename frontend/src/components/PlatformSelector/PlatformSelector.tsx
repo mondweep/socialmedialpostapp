@@ -33,10 +33,10 @@ export const PlatformSelector: React.FC = () => {
     // Only format content when selecting a new platform
     if (!isSelected && content) {
       try {
-        const response = await fetch(`/api/format/${platform}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}api/format/${platform}`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+              'Content-Type': 'application/json',
           },
           body: JSON.stringify({ content: content }),
         });
